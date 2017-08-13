@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import _ from 'lodash';
 import ReactDOM from 'react-dom';
 import Keys from './config.js';
 import YTSearch from 'youtube-api-search';
@@ -22,7 +23,11 @@ class App extends Component {
             selectedVideo: null
         };
 
-        YTSearch({key: youTubeApiKey, term: 'surfboards'}, (videos) => {
+        this.videoSearch('surfboards');
+    }
+
+    videoSearch(term) {
+        YTSearch({key: youTubeApiKey, term: term}, (videos) => {
             // this.setState({ videos: videos }); when property and value are the same, you can do the line below.
             this.setState({ 
                 videos: videos,
@@ -32,9 +37,11 @@ class App extends Component {
     }
 
     render() {
+        const videoSearch = _.debounce((term) => { this.videoSearch(term) }, 300);
+        
         return (
             <div>
-                <SearchBar />
+                <SearchBar onSearchTermChange={ term => videoSearch(term) }/>
                 <VideoDetail video={ this.state.selectedVideo }/> 
                 <VideoList 
                     onVideoSelect={ selectedVideo => this.setState({ selectedVideo })}
